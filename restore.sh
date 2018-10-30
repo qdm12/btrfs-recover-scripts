@@ -1,6 +1,6 @@
 #!/bin/sh
 
-printf "RESTORE SCRIPT"
+printf "RESTORE SCRIPT\n"
 
 DISK_TO_RECOVER=/dev/mapper/cachedev_0
 RESTORE_PATH=/volumeUSB1/usbshare
@@ -23,7 +23,24 @@ TXID_BLOCKID=$(paste <(echo "$TRANSIDS") <(echo "$BLOCKNUMBERS"))
 SORTED_ROOTS=$(echo "$TXID_BLOCKID" | sort -rn | uniq | cut -f 2)
 printf "Searching for $RECENT_FILEPATH in the roots block numbers...\n"
 printf "Trying roots block numbers: "
-for BLOCK in $SORTED_ROOTS; do printf "$BLOCK "; if [ "$(btrfs restore -ivD -t "$BLOCK" "$DISK_TO_RECOVER" /tmp 2> /dev/null | grep "$RECENT_FILEPATH")" != "" ]; then printf "\n$BLOCK root block number contains $RECENT_FILEPATH\nTrying roots block numbers: "; fi; done
-read -p "Which root block number do you want to recover from (the first one is better)? " -r
-echo
-btrfs restore -iv -t "$REPLY" "$DISK_TO_RECOVER" "$RESTORE_PATH"
+FIRST_VALID_ROOT=
+for BLOCK in $SORTED_ROOTS; do
+  printf "$BLOCK ";
+  if [ "$(btrfs restore -ivD -t "$BLOCK" "$DISK_TO_RECOVER" /tmp 2> /dev/null | grep "$RECENT_FILEPATH")" != "" ]; then
+    if [ "$FIRST_VALID_ROOT" = "" ]; then FIRST_VALID_ROOT="$BLOCK"; fi
+    printf "\n$BLOCK root block number contains $RECENT_FILEPATH"
+    read -p "Do you want to recover from root block $BLOCK ? (y/n) [y]: " -r -n 1
+    echo
+    if [ "$REPLY" != "y" ]; then
+      printf "Continuing... trying roots block numbers: ";
+    else
+      printf "Recovering $DISK_TO_RECOVER to $RESTORE_PATH with root block number $BLOCK...\n";
+      btrfs restore -iv -t "$REPLY" "$DISK_TO_RECOVER" "$RESTORE_PATH";
+      printf "\nFinished\n\n"
+      exit $?
+    fi;
+  fi;
+done;
+printf "All roots blocks numbers have been tried, recovering with first valid root block number $FIRST_VALID_ROOT\n"
+btrfs restore -iv -t "$FIRST_VALID_ROOT" "$DISK_TO_RECOVER" "$RESTORE_PATH"
+printf "\nFinished\n\n"

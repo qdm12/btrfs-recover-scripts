@@ -1,6 +1,6 @@
 #!/bin/sh
 
-printf "UNMOUNT VOLUME SCRIPT"
+printf "UNMOUNT VOLUME SCRIPT\n"
 
 DISK_TO_RECOVER=/dev/mapper/cachedev_0
 

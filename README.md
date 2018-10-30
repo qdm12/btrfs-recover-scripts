@@ -2,20 +2,80 @@
 
 *Scripts to help you recover the latest files you have lost in a BTRFS volume*
 
-1. Download the scripts
+## Step 1: Unmounting your BTRFS volume
+
+1. Download the *unmount* script
+
    ```sh
-   wget https://raw.githubusercontent.com/qdm12/btrfs-recover-scripts/master/unmount.sh
-   wget https://raw.githubusercontent.com/qdm12/btrfs-recover-scripts/master/restore.sh
-   wget https://raw.githubusercontent.com/qdm12/btrfs-recover-scripts/master/limit-restore.sh   
+   wget -q https://raw.githubusercontent.com/qdm12/btrfs-recover-scripts/master/unmount.sh
    ```
-1. Modify the variables in the scripts at the top:
-    - `DISK_TO_RECOVER` is the path to the unmounted disk (BTRFS volume) to recover
-    - `RESTORE_PATH` is the path to which store the restored data from the disk
-    - `RECENT_FILEPATH` is a full or partial path or path+filename or filename of a recent file you want to recover
-1. Make them executable
+
+1. Change the variable `DISK_TO_RECOVER` to your BTRFS volume name (say `/dev/mapper/cachedev_0`) in *unmount.sh*:
+
+   ```sh
+   sed -i 's/^DISK_TO_RECOVER=*$/DISK_TO_RECOVER=/dev/mapper/cachedev_0' unmount.sh
+   ```
+
+1. Make the script executable and run it:
+
     ```sh
-    sudo chmod 700 unmount.sh restore.sh limit-restore.sh  
+    sudo chmod 700 unmount.sh
+    sudo ./unmount.sh
     ```
-1. If you need to, `./unmount.sh` to unmount your BTRFS volume
-1. Then run `./restore.sh` to find the right root block number and recover your files
-1. At the same time, you can run `./limit-restore.sh` to pause the restore process in case your restore drive is almost full.
+
+1. Verify your drive is not present anymore with `df -H`
+
+## Step 2: Restore the drive
+
+1. Download the *restore* script
+
+   ```sh
+   wget -q https://raw.githubusercontent.com/qdm12/btrfs-recover-scripts/master/restore.sh
+   ```
+
+1. Change the variables in *restore.sh*
+    - `DISK_TO_RECOVER` is the path to the unmounted BTRFS volume to recover (say `/dev/mapper/cachedev_0`)
+    - `RESTORE_PATH` is the path to which the restored data from the disk will be written (say `/volumeUSB1/usbshare`)
+    - `RECENT_FILEPATH` is a full or partial path or path+filename or filename of a recent file you want to recover, to act as a time reference (say `/data/homes/myhome/recentfile.txt`)
+
+   ```sh
+   sed -i 's/^DISK_TO_RECOVER=*$/DISK_TO_RECOVER=/dev/mapper/cachedev_0' restore.sh
+   sed -i 's/^RESTORE_PATH=*$/RESTORE_PATH=/volumeUSB1/usbshare' restore.sh
+   sed -i 's/^RECENT_FILEPATH=*$/RECENT_FILEPATH=/data/homes/myhome/recentfile.txt' restore.sh
+   ```
+
+1. Make the script executable and run it:
+
+    ```sh
+    sudo chmod 700 restore.sh
+    sudo ./restore.sh
+    ```
+
+## Optional step 3: Limit recovery drive usage
+
+If your drive is not large enough to recover the necessary data from the BTRFS volume, this is for you.
+
+1. Open **another shell**
+1. Download the *limit-restore* script
+
+   ```sh
+   wget -q https://raw.githubusercontent.com/qdm12/btrfs-recover-scripts/master/limit-restore.sh
+   ```
+
+1. Change the variables in *limit-restore.sh*
+    - `DISK_TO_RECOVER` is the path to the unmounted BTRFS volume to recover (say `/dev/mapper/cachedev_0`)
+    - `RESTORE_PATH` is the path to which the restored data from the disk will be written (say `/volumeUSB1/usbshare`)
+
+   ```sh
+   sed -i 's/^DISK_TO_RECOVER=*$/DISK_TO_RECOVER=/dev/mapper/cachedev_0' restore.sh
+   sed -i 's/^RESTORE_PATH=*$/RESTORE_PATH=/volumeUSB1/usbshare' restore.sh
+   ```
+
+1. Make the script executable and run it:
+
+    ```sh
+    sudo chmod 700 limit-restore.sh
+    sudo ./limit-restore.sh
+    ```
+
+This will automatically pause the restore process when your restore drive is 90% full.

@@ -28,8 +28,8 @@ for BLOCK in $SORTED_ROOTS; do
   printf "$BLOCK ";
   if [ "$(btrfs restore -ivD -t "$BLOCK" "$DISK_TO_RECOVER" /tmp 2> /dev/null | grep "$RECENT_FILEPATH")" != "" ]; then
     if [ "$FIRST_VALID_ROOT" = "" ]; then FIRST_VALID_ROOT="$BLOCK"; fi;
-    printf "\nRoot block number $BLOCK contains $RECENT_FILEPATH";
-    read -p "\nDo you want to recover from this root block number ? (y/n) [y]: " -r -n 1;
+    printf "\nRoot block number $BLOCK contains $RECENT_FILEPATH - ";
+    read -p "recover from this root block number? (y/n) [y]: " -r -n 1;
     echo;
     if [ "$REPLY" != "y" ]; then
       printf "Continuing... trying roots block numbers: ";

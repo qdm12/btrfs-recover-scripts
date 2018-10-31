@@ -39,9 +39,9 @@
     - `RECENT_FILEPATH` is a full or partial path or path+filename or filename of a recent file you want to recover, to act as a time reference (say `/data/homes/myhome/recentfile.txt`)
 
    ```sh
-   sed -i 's/^DISK_TO_RECOVER=*$/DISK_TO_RECOVER=/dev/mapper/cachedev_0' restore.sh
-   sed -i 's/^RESTORE_PATH=*$/RESTORE_PATH=/volumeUSB1/usbshare' restore.sh
-   sed -i 's/^RECENT_FILEPATH=*$/RECENT_FILEPATH=/data/homes/myhome/recentfile.txt' restore.sh
+   sed -i 's/^DISK_TO_RECOVER=.*$/DISK_TO_RECOVER=\/dev\/mapper\/cachedev_0' restore.sh
+   sed -i 's/^RESTORE_PATH=.*$/RESTORE_PATH=\/volumeUSB1\/usbshare' restore.sh
+   sed -i 's/^RECENT_FILEPATH=.*$/RECENT_FILEPATH=\/data\/homes\/myhome\/recentfile.txt' restore.sh
    ```
 
 1. Make the script executable and run it:
@@ -67,8 +67,8 @@ If your drive is not large enough to recover the necessary data from the BTRFS v
     - `RESTORE_PATH` is the path to which the restored data from the disk will be written (say `/volumeUSB1/usbshare`)
 
    ```sh
-   sed -i 's/^DISK_TO_RECOVER=*$/DISK_TO_RECOVER=/dev/mapper/cachedev_0' restore.sh
-   sed -i 's/^RESTORE_PATH=*$/RESTORE_PATH=/volumeUSB1/usbshare' restore.sh
+   sed -i 's/^DISK_TO_RECOVER=.*$/DISK_TO_RECOVER=\/dev\/mapper\/cachedev_0' restore.sh
+   sed -i 's/^RESTORE_PATH=.*$/RESTORE_PATH=\/volumeUSB1\/usbshare' restore.sh
    ```
 
 1. Make the script executable and run it:

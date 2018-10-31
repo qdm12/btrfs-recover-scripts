@@ -27,20 +27,23 @@ FIRST_VALID_ROOT=
 for BLOCK in $SORTED_ROOTS; do
   printf "$BLOCK ";
   if [ "$(btrfs restore -ivD -t "$BLOCK" "$DISK_TO_RECOVER" /tmp 2> /dev/null | grep "$RECENT_FILEPATH")" != "" ]; then
-    if [ "$FIRST_VALID_ROOT" = "" ]; then FIRST_VALID_ROOT="$BLOCK"; fi
-    printf "\n$BLOCK root block number contains $RECENT_FILEPATH"
-    read -p "Do you want to recover from root block $BLOCK ? (y/n) [y]: " -r -n 1
-    echo
+    if [ "$FIRST_VALID_ROOT" = "" ]; then FIRST_VALID_ROOT="$BLOCK"; fi;
+    printf "\nRoot block number $BLOCK contains $RECENT_FILEPATH";
+    read -p "\nDo you want to recover from this root block number ? (y/n) [y]: " -r -n 1;
+    echo;
     if [ "$REPLY" != "y" ]; then
       printf "Continuing... trying roots block numbers: ";
     else
       printf "Recovering $DISK_TO_RECOVER to $RESTORE_PATH with root block number $BLOCK...\n";
-      btrfs restore -iv -t "$REPLY" "$DISK_TO_RECOVER" "$RESTORE_PATH" 2>&1 | tee btrfs-restore.log;
+      btrfs restore -iv -t "$BLOCK" "$DISK_TO_RECOVER" "$RESTORE_PATH" 2>&1 | tee btrfs-restore.log;
+      status=$?;
       printf "\nFinished\nYou can see the log in btrfs-restore.log\n";
-      exit $?;
+      return $status;
     fi;
   fi;
 done;
 printf "All roots blocks numbers have been tried, recovering with first valid root block number $FIRST_VALID_ROOT\n"
 btrfs restore -iv -t "$FIRST_VALID_ROOT" "$DISK_TO_RECOVER" "$RESTORE_PATH" 2>&1 | tee btrfs-restore.log
+status=$?;
 printf "\nFinished\nYou can see the log in btrfs-restore.log\n"
+return $status;

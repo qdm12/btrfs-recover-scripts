@@ -35,12 +35,12 @@ for BLOCK in $SORTED_ROOTS; do
       printf "Continuing... trying roots block numbers: ";
     else
       printf "Recovering $DISK_TO_RECOVER to $RESTORE_PATH with root block number $BLOCK...\n";
-      btrfs restore -iv -t "$REPLY" "$DISK_TO_RECOVER" "$RESTORE_PATH";
-      printf "\nFinished\n\n"
-      exit $?
+      btrfs restore -iv -t "$REPLY" "$DISK_TO_RECOVER" "$RESTORE_PATH" 2>&1 | tee btrfs-restore.log;
+      printf "\nFinished\nYou can see the log in btrfs-restore.log\n";
+      exit $?;
     fi;
   fi;
 done;
 printf "All roots blocks numbers have been tried, recovering with first valid root block number $FIRST_VALID_ROOT\n"
-btrfs restore -iv -t "$FIRST_VALID_ROOT" "$DISK_TO_RECOVER" "$RESTORE_PATH"
-printf "\nFinished\n\n"
+btrfs restore -iv -t "$FIRST_VALID_ROOT" "$DISK_TO_RECOVER" "$RESTORE_PATH" 2>&1 | tee btrfs-restore.log
+printf "\nFinished\nYou can see the log in btrfs-restore.log\n"

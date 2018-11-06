@@ -21,7 +21,7 @@ else
       break
     fi
     printf "$DISK_TO_RECOVER is mounted at $DISK_MOUNT\n"
-    PIDS=$(ls -l /proc/[0-9]*/fd/* 2> /dev/null | grep "$DISK_MOUNT" | grep -oE '/proc/.*/f' | grep -oE '[0-9]*')
+    PIDS=$(ls -l /proc/[0-9]*/fd/* 2> /dev/null | grep "$DISK_MOUNT" | grep -oE "/proc/.*/f" | grep -oE "[0-9]*" | sort -n | uniq)
     printf "About to kill the following processes to unmount $DISK_TO_RECOVER mounted at $DISK_MOUNT : "
     for pid in $PIDS; do printf "$pid "; done; printf "\n"
     read -p "Continue? (y/n) [y]:" -n 1 -r

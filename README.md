@@ -2,6 +2,8 @@
 
 *Scripts to help you recover the latest files you have lost in a BTRFS volume*
 
+[![Donate PayPal](https://img.shields.io/badge/Donate-PayPal-green.svg)](https://paypal.me/qdm12)
+
 ## Step 1: Unmounting your BTRFS volume
 
 1. Download the *unmount* script

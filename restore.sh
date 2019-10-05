@@ -8,7 +8,7 @@ RECENT_FILEPATH=/mypath/recentfile.txt
 
 # Find roots with transaction id
 printf "Finding all roots..."
-ROOTS_RAW=$(btrfs-find-root "$DISK_TO_RECOVER" 2> /dev/null | grep 'Well')
+ROOTS_RAW=`btrfs-find-root "$DISK_TO_RECOVER" 2> /dev/null | grep 'Well'`
 status=$?
 if [ $status != 0 ]; then
   printf "FAILURE ($status)\n"
@@ -17,17 +17,17 @@ fi
 printf "$(echo "$ROOTS_RAW" | wc -l) found\n"
 
 # Sort roots block numbers by transaction id
-BLOCKNUMBERS=$(echo "$ROOTS_RAW" | grep -oE 'Well block [0-9]*' | grep -oE '[0-9]*')
-TRANSIDS=$(echo "$ROOTS_RAW" | grep -oE '\(gen: [0-9]*' | grep -oE '[0-9]*')
-TXID_BLOCKID=$(paste <(echo "$TRANSIDS") <(echo "$BLOCKNUMBERS"))
-SORTED_ROOTS=$(echo "$TXID_BLOCKID" | sort -rn | uniq | cut -f 2)
+BLOCKNUMBERS=`echo "$ROOTS_RAW" | grep -oE 'Well block [0-9]*' | grep -oE '[0-9]*'`
+TRANSIDS=`echo "$ROOTS_RAW" | grep -oE '\(gen: [0-9]*' | grep -oE '[0-9]*'`
+TXID_BLOCKID=`paste <(echo "$TRANSIDS") <(echo "$BLOCKNUMBERS")`
+SORTED_ROOTS=`echo "$TXID_BLOCKID" | sort -rn | uniq | cut -f 2`
 printf "Searching for $RECENT_FILEPATH in the roots block numbers...\n"
 printf "Trying roots block numbers: "
 FIRST_VALID_ROOT=
 for BLOCK in $SORTED_ROOTS; do
   printf "$BLOCK ";
-  if [ "$(btrfs restore -ivD -t "$BLOCK" "$DISK_TO_RECOVER" /tmp 2> /dev/null | grep "$RECENT_FILEPATH")" != "" ]; then
-    if [ "$FIRST_VALID_ROOT" = "" ]; then FIRST_VALID_ROOT="$BLOCK"; fi;
+  if [ `btrfs restore -ivD -t "$BLOCK" "$DISK_TO_RECOVER" /tmp 2> /dev/null | grep "$RECENT_FILEPATH"` != "" ]; then
+    [ "$FIRST_VALID_ROOT" = "" ] && FIRST_VALID_ROOT="$BLOCK";
     printf "\nRoot block number $BLOCK contains $RECENT_FILEPATH - ";
     read -p "recover from this root block number? (y/n) [y]: " -r -n 1;
     echo;

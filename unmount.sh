@@ -27,7 +27,7 @@ else
     read -p "Continue? (y/n) [y]:" -n 1 -r
     echo
     if [[ "$REPLY" != "y" && "$REPLY" != "" ]]; then
-      return 0
+      exit 0
     fi
     printf "Processes killed: "
     for pid in $PIDS; do kill $pid; printf "$pid "; done; printf "\n"

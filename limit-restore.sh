@@ -10,7 +10,7 @@ RESTORE_PID=$(ls -l /proc/[0-9]*/fd/* 2> /dev/null | grep "$DISK_TO_RECOVER" | g
 if [ $(echo "$RESTORE_PID" | wc -l) -gt 1 ]; then
   printf "\nPlease make sure there is only the BTRFS recovery process accessing your unmounted BTRFS volume.\n";
   printf "You have the following processes accessing it currently: $RESTORE_PID";
-  return 1;
+  exit 1;
 fi
 printf "$RESTORE_PID\n"
 printf "Waiting for $RESTORE_PATH to reach 90% disk space to STOP process $RESTORE_PID...\n"

@@ -12,7 +12,7 @@ ROOTS_RAW=$(btrfs-find-root "$DISK_TO_RECOVER" 2> /dev/null | grep 'Well')
 status=$?
 if [ $status != 0 ]; then
   printf "FAILURE ($status)\n"
-  return 1
+  exit 1
 fi
 printf "$(echo "$ROOTS_RAW" | wc -l) found\n"
 
@@ -37,13 +37,12 @@ for BLOCK in $SORTED_ROOTS; do
       printf "Recovering $DISK_TO_RECOVER to $RESTORE_PATH with root block number $BLOCK...\n";
       btrfs restore -iv -t "$BLOCK" "$DISK_TO_RECOVER" "$RESTORE_PATH" 2>&1 | tee btrfs-restore.log;
       status=$?;
-      printf "\nFinished\nYou can see the log in btrfs-restore.log\n";
-      return $status;
+      printf "\nFinished with status $status\nYou can see the log in btrfs-restore.log\n";
+      exit $status
     fi;
   fi;
 done;
 printf "All roots blocks numbers have been tried, recovering with first valid root block number $FIRST_VALID_ROOT\n"
 btrfs restore -iv -t "$FIRST_VALID_ROOT" "$DISK_TO_RECOVER" "$RESTORE_PATH" 2>&1 | tee btrfs-restore.log
-status=$?;
-printf "\nFinished\nYou can see the log in btrfs-restore.log\n"
-return $status;
+printf "\nFinished with status $status\nYou can see the log in btrfs-restore.log\n"
+exit $status

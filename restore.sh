@@ -10,7 +10,7 @@ RECENT_FILEPATH=/mypath/recentfile.txt
 printf "Finding all roots..."
 ROOTS_RAW=`btrfs-find-root "$DISK_TO_RECOVER" 2> /dev/null | grep 'Well'`
 status=$?
-if [ $status != 0 ]; then
+if [[ $status != 0 ]]; then
   printf "FAILURE ($status)\n"
   exit 1
 fi
@@ -26,12 +26,12 @@ printf "Trying roots block numbers: "
 FIRST_VALID_ROOT=
 for BLOCK in $SORTED_ROOTS; do
   printf "$BLOCK ";
-  if [ `btrfs restore -ivD -t "$BLOCK" "$DISK_TO_RECOVER" /tmp 2> /dev/null | grep "$RECENT_FILEPATH"` != "" ]; then
-    [ "$FIRST_VALID_ROOT" = "" ] && FIRST_VALID_ROOT="$BLOCK";
+  if [[ `btrfs restore -ivD -t "$BLOCK" "$DISK_TO_RECOVER" /tmp 2> /dev/null | grep "$RECENT_FILEPATH"` != "" ]]; then
+    [[ "$FIRST_VALID_ROOT" = "" ]] && FIRST_VALID_ROOT="$BLOCK";
     printf "\nRoot block number $BLOCK contains $RECENT_FILEPATH - ";
     read -p "recover from this root block number? (y/n) [y]: " -r -n 1;
     echo;
-    if [ "$REPLY" != "y" ]; then
+    if [[ "$REPLY" != "y" ]]; then
       printf "Continuing... trying roots block numbers: ";
     else
       printf "Recovering $DISK_TO_RECOVER to $RESTORE_PATH with root block number $BLOCK...\n";
